@@ -39,3 +39,14 @@ FLUSH PRIVILEGES;
 dotnet ef migrations add ClienteAdd
 dotnet ef database update
 ```
+
+# Instalação do code generator
+``` bash
+dotnet tool install -g dotnet-aspnet-codegenerator
+```
+
+# Gerando o scaffold de clientes
+``` bash
+dotnet aspnet-codegenerator controller -name ClientesController -m Cliente -dc DbContexto --relativeFolderPath Controllers --useDefaultLayout
+```
+
