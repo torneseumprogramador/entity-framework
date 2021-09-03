@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using entity_framework.Models;
 using entity_framework.Servicos.Database;
+using entity_framework.ModelViews;
 
 namespace entity_framework.Controllers
 {
@@ -22,8 +23,14 @@ namespace entity_framework.Controllers
         // GET: Clientes
         public async Task<IActionResult> Index()
         {
+            var listaClientes =  await _context.Clientes.Where(c => 
+                c.Nome.ToLower().Contains("d") && c.Nome.ToLower().Contains("o")
+            ).ToListAsync();
+
+
             var dbContexto = _context.Clientes.Include(c => c.Endereco);
-            return View(await dbContexto.ToListAsync());
+            var lista = await dbContexto.ToListAsync();
+            return View(lista);
         }
 
         // GET: Clientes/Details/5
@@ -42,6 +49,60 @@ namespace entity_framework.Controllers
                 return NotFound();
             }
 
+            var pedidosContext = _context.Clientes.Where(c => c.Id  == cliente.Id);
+            var pedidos =  pedidosContext.Join(
+                _context.Pedidos,
+                cli => cli.Id,
+                ped => ped.ClienteId,
+                (cli, ped) => new ClientePedido {
+                    Cliente = cli.Nome,
+                    ValorTotal = ped.ValorTotal,
+                    PedidoId = ped.Id
+                }
+            ).Join(
+                _context.PedidosProdutos,
+                pCliente => pCliente.PedidoId,
+                pp => pp.PedidoId,
+                (pCliente, pp) => new ClientePedido {
+                    Cliente = pCliente.Cliente,
+                    ValorTotal = pCliente.ValorTotal,
+                    PedidoId = pCliente.PedidoId,
+                    Quantidade = pp.Quantidade,
+                    Valor = pp.Valor,
+                    ProdutoId = pp.ProdutoId,
+                }
+            ).Join(
+                _context.Produtos,
+                pCliente => pCliente.ProdutoId,
+                produto => produto.Id,
+                (pCliente, produto) => new ClientePedido {
+                    Cliente = pCliente.Cliente,
+                    ValorTotal = pCliente.ValorTotal,
+                    PedidoId = pCliente.PedidoId,
+                    Quantidade = pCliente.Quantidade,
+                    Valor = pCliente.Valor,
+                    Produto = produto.Nome,
+                }
+            ).ToListAsync(); //.ToQueryString(); // mostra o SQL GERADO
+
+            /*
+            SET @__cliente_Id_0 = 1;
+
+            SELECT 
+            c.nome AS Cliente, 
+            p.valor_total AS ValorTotal, 
+            p.id AS PedidoId, 
+            p0.quantidade AS Quantidade, 
+            p0.valor AS Valor, 
+            p1.nome AS Produto
+            FROM clientes AS c
+            INNER JOIN pedidos AS p ON c.id = p.cliente_id
+            INNER JOIN pedidos_produtos AS p0 ON p.id = p0.pedido_id
+            INNER JOIN produtos AS p1 ON p0.produto_id = p1.id
+            WHERE c.id = @__cliente_Id_0
+            */
+
+            ViewBag.pedidos = pedidos;
             return View(cliente);
         }
 
@@ -61,7 +122,7 @@ namespace entity_framework.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(cliente);
+                _context.Clientes.Add(cliente);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

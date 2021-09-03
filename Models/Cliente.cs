@@ -18,7 +18,7 @@ namespace entity_framework.Models
         public string Nome { get; set; }
 
         [Column("observacao", TypeName="text")]
-        [Required]
+        [Required(ErrorMessage = "A observação é obrigatória")]
         public string Observacao { get; set; }
 
         [Column("endereco_id")]

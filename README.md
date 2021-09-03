@@ -36,6 +36,7 @@ FLUSH PRIVILEGES;
 
 # Comandos para migração:
 ``` bash
+dotnet tool install --global dotnet-ef
 dotnet ef migrations add ClienteAdd
 dotnet ef database update
 ```

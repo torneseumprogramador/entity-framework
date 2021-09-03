@@ -1,7 +1,9 @@
+@using entity_framework.ModelViews
 @model entity_framework.Models.Cliente
 
 @{
     ViewData["Title"] = "Details";
+    var pedidos = (List<ClientePedido>)ViewBag.pedidos;
 }
 
 <h1>Details</h1>
@@ -30,6 +32,53 @@
         </dd>
     </dl>
 </div>
+
+<hr>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Cliente
+            </th>
+            <th>
+                Valor Total
+            </th>
+            <th>
+                Produto
+            </th>
+            <th>
+                Quantidade
+            </th>
+            <th>
+                Valor unidade
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pedido in pedidos) {
+        <tr>
+            <td>
+                @pedido.Cliente
+            </td>
+            <td>
+                @pedido.ValorTotal
+            </td>
+            <td>
+                @pedido.Produto
+            </td>
+            <td>
+                @pedido.Quantidade
+            </td>
+            <td>
+                @pedido.Valor
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
