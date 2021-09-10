@@ -49,7 +49,86 @@ namespace entity_framework.Controllers
                 return NotFound();
             }
 
-            var pedidosContext = _context.Clientes.Where(c => c.Id  == cliente.Id);
+            var pedidosContext = _context.Clientes;
+            var pedidosSql = pedidosContext.Join(
+                _context.Pedidos,
+                cli => cli.Id,
+                ped => ped.ClienteId,
+                (cli, ped) => new ClientePedido {
+                    Cliente = cli.Nome,
+                    ValorTotal = ped.ValorTotal
+                }
+            ).GroupBy(p => p.Cliente).Select(c => new {
+                Nome = c.Key,
+                ValorTotal = c.Sum( cp => cp.ValorTotal )
+            }).ToQueryString();
+
+             var pedidos = await pedidosContext.Join(
+                _context.Pedidos,
+                cli => cli.Id,
+                ped => ped.ClienteId,
+                (cli, ped) => new ClientePedido {
+                    Cliente = cli.Nome,
+                    ValorTotal = ped.ValorTotal
+                }
+            ).GroupBy(p => p.Cliente).Select(c => new {
+                Nome = c.Key,
+                ValorTotal = c.Sum( cp => cp.ValorTotal )
+            }).ToListAsync();
+
+
+            /*
+            using(var command = _context.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = "SELECT clientes.nome, sum(pedidos.valor_total) as valor_total FROM pedidos inner join clientes on clientes.id = pedidos.cliente_id group by clientes.id";
+                _context.Database.OpenConnection();
+
+                using(var result = await command.ExecuteReaderAsync())
+                {
+                    var pedidos_agrupados = new List<dynamic>();
+                    while(result.Read())
+                    {
+                        pedidos_agrupados.Add(new {
+                            Nome = result["nome"].ToString(),
+                            ValorTotal = Convert.ToDouble(result["valor_total"]),
+                        });
+                    }
+
+                    ViewBag.pedidos = pedidos_agrupados;
+                }
+                _context.Database.CloseConnection();
+            }*/
+
+            /*using(var command = _context.Database.GetDbConnection().CreateCommand())
+            {
+                command.CommandText = "select clientes.nome as cliente, pedidos.valor_total, produtos.nome as produto, pedidos_produtos.quantidade, pedidos_produtos.valor  " +
+                    "from clientes " + 
+                    "inner join pedidos on pedidos.cliente_id = clientes.id " + 
+                    "inner join pedidos_produtos on pedidos_produtos.pedido_id = pedidos.id " +
+                    "inner join produtos on produtos.id = pedidos_produtos.produto_id " +
+                    "where clientes.id = " + cliente.Id;
+                _context.Database.OpenConnection();
+
+                using(var result = await command.ExecuteReaderAsync())
+                {
+                    var pedidos = new List<ClientePedido>();
+                    while(result.Read())
+                    {
+                        pedidos.Add(new ClientePedido{
+                            Cliente = result["cliente"].ToString(),
+                            ValorTotal = Convert.ToDouble(result["valor_total"]),
+                            Quantidade = Convert.ToInt32(result["quantidade"]),
+                            Produto = result["produto"].ToString(),
+                            Valor = Convert.ToDouble(result["valor"]),
+                        });
+                    }
+
+                    ViewBag.pedidos = pedidos;
+                }
+                _context.Database.CloseConnection();
+            }*/
+
+            /*var pedidosContext = _context.Clientes.Where(c => c.Id  == cliente.Id);
             var pedidos =  pedidosContext.Join(
                 _context.Pedidos,
                 cli => cli.Id,
@@ -84,7 +163,7 @@ namespace entity_framework.Controllers
                     Produto = produto.Nome,
                 }
             ).ToListAsync(); //.ToQueryString(); // mostra o SQL GERADO
-
+            */
             /*
             SET @__cliente_Id_0 = 1;
 
@@ -102,7 +181,7 @@ namespace entity_framework.Controllers
             WHERE c.id = @__cliente_Id_0
             */
 
-            ViewBag.pedidos = pedidos;
+            // ViewBag.pedidos = pedidos;
             return View(cliente);
         }
 
