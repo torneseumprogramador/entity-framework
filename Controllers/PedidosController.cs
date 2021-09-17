@@ -50,7 +50,7 @@ namespace entity_framework.Controllers
         public IActionResult Create()
         {
             ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome");
-            ViewData["EnderecoId"] = new SelectList(_context.enderecos, "Id", "Bairro");
+            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro");
             return View();
         }
 
@@ -68,7 +68,7 @@ namespace entity_framework.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
-            ViewData["EnderecoId"] = new SelectList(_context.enderecos, "Id", "Bairro", pedido.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", pedido.EnderecoId);
             return View(pedido);
         }
 
@@ -86,7 +86,7 @@ namespace entity_framework.Controllers
                 return NotFound();
             }
             ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
-            ViewData["EnderecoId"] = new SelectList(_context.enderecos, "Id", "Bairro", pedido.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", pedido.EnderecoId);
             return View(pedido);
         }
 
@@ -123,7 +123,7 @@ namespace entity_framework.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
-            ViewData["EnderecoId"] = new SelectList(_context.enderecos, "Id", "Bairro", pedido.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", pedido.EnderecoId);
             return View(pedido);
         }
 

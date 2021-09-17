@@ -49,32 +49,91 @@ namespace entity_framework.Controllers
                 return NotFound();
             }
 
-            var pedidosContext = _context.Clientes;
-            var pedidosSql = pedidosContext.Join(
-                _context.Pedidos,
-                cli => cli.Id,
-                ped => ped.ClienteId,
-                (cli, ped) => new ClientePedido {
-                    Cliente = cli.Nome,
-                    ValorTotal = ped.ValorTotal
-                }
-            ).GroupBy(p => p.Cliente).Select(c => new {
-                Nome = c.Key,
-                ValorTotal = c.Sum( cp => cp.ValorTotal )
-            }).ToQueryString();
 
-             var pedidos = await pedidosContext.Join(
-                _context.Pedidos,
-                cli => cli.Id,
-                ped => ped.ClienteId,
-                (cli, ped) => new ClientePedido {
-                    Cliente = cli.Nome,
-                    ValorTotal = ped.ValorTotal
-                }
-            ).GroupBy(p => p.Cliente).Select(c => new {
-                Nome = c.Key,
-                ValorTotal = c.Sum( cp => cp.ValorTotal )
-            }).ToListAsync();
+            // var clientes = from c in _context.Clientes
+            //     join e in _context.Enderecos on c.EnderecoId equals e.Id
+            //     join p in _context.Pedidos on c.Id equals p.ClienteId
+            //     join pp in _context.PedidosProdutos on p.Id equals pp.PedidoId
+            //     join produto in _context.Produtos on pp.ProdutoId equals produto.Id
+            //     where c.Nome == "Danilo" && c.Id == 1
+            //     select new {
+            //         Nome = c.Nome,
+            //         Endereco = e.Logradouro,
+            //         PedidoId = p.Id,
+            //         Quantidade = pp.Quantidade,
+            //         NomeProduto = produto.Nome,
+            //     };
+
+            // foreach (var cli in clientes)
+            // {
+            //     Console.WriteLine(cli);
+            // }
+
+
+            // var clientes = from c in _context.Clientes
+            // join p in _context.Pedidos on c.Id equals p.ClienteId
+            // group p by c.Nome into grouping
+            // select new {
+            //     Nome = grouping.Key,
+            //     Total = grouping.Sum( g => g.ValorTotal)
+            // };
+
+            // var clientes = from c in _context.Clientes
+            // join p in _context.Pedidos on c.Id equals p.ClienteId
+            // join pp in _context.PedidosProdutos on p.Id equals pp.PedidoId
+            // group p by new { c.Nome, pp.Quantidade } into grouping
+            // select new {
+            //     Nome = grouping.Key.Nome,
+            //     Quantidade = grouping.Key.Quantidade,
+            //     Total = grouping.Sum( g => g.ValorTotal)
+            // };
+
+
+        var clientes = from c in _context.Clientes
+        where (
+            from p in _context.Pedidos
+            where p.ClienteId == c.Id
+            select p
+        ).Count() >= 2
+        select c.Nome;
+
+        foreach (var cli in clientes)
+        {
+            Console.WriteLine(cli);
+        }
+
+
+            var x = "";
+
+
+            
+
+            // var pedidosContext = _context.Clientes;
+            // var pedidosSql = pedidosContext.Join(
+            //     _context.Pedidos,
+            //     cli => cli.Id,
+            //     ped => ped.ClienteId,
+            //     (cli, ped) => new ClientePedido {
+            //         Cliente = cli.Nome,
+            //         ValorTotal = ped.ValorTotal
+            //     }
+            // ).GroupBy(p => p.Cliente).Select(c => new {
+            //     Nome = c.Key,
+            //     ValorTotal = c.Sum( cp => cp.ValorTotal )
+            // }).ToQueryString();
+
+            //  var pedidos = await pedidosContext.Join(
+            //     _context.Pedidos,
+            //     cli => cli.Id,
+            //     ped => ped.ClienteId,
+            //     (cli, ped) => new ClientePedido {
+            //         Cliente = cli.Nome,
+            //         ValorTotal = ped.ValorTotal
+            //     }
+            // ).GroupBy(p => p.Cliente).Select(c => new {
+            //     Nome = c.Key,
+            //     ValorTotal = c.Sum( cp => cp.ValorTotal )
+            // }).ToListAsync();
 
 
             /*
@@ -188,7 +247,7 @@ namespace entity_framework.Controllers
         // GET: Clientes/Create
         public IActionResult Create()
         {
-            ViewData["EnderecoId"] = new SelectList(_context.enderecos, "Id", "Bairro");
+            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro");
             return View();
         }
 
@@ -205,7 +264,7 @@ namespace entity_framework.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EnderecoId"] = new SelectList(_context.enderecos, "Id", "Bairro", cliente.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", cliente.EnderecoId);
             return View(cliente);
         }
 
@@ -222,7 +281,7 @@ namespace entity_framework.Controllers
             {
                 return NotFound();
             }
-            ViewData["EnderecoId"] = new SelectList(_context.enderecos, "Id", "Bairro", cliente.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", cliente.EnderecoId);
             return View(cliente);
         }
 
@@ -258,7 +317,7 @@ namespace entity_framework.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EnderecoId"] = new SelectList(_context.enderecos, "Id", "Bairro", cliente.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", cliente.EnderecoId);
             return View(cliente);
         }
 

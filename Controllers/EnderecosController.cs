@@ -22,7 +22,7 @@ namespace entity_framework.Controllers
         // GET: Enderecos
         public async Task<IActionResult> Index()
         {
-            return View(await _context.enderecos.ToListAsync());
+            return View(await _context.Enderecos.ToListAsync());
         }
 
         // GET: Enderecos/Details/5
@@ -33,7 +33,7 @@ namespace entity_framework.Controllers
                 return NotFound();
             }
 
-            var endereco = await _context.enderecos
+            var endereco = await _context.Enderecos
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (endereco == null)
             {
@@ -73,7 +73,7 @@ namespace entity_framework.Controllers
                 return NotFound();
             }
 
-            var endereco = await _context.enderecos.FindAsync(id);
+            var endereco = await _context.Enderecos.FindAsync(id);
             if (endereco == null)
             {
                 return NotFound();
@@ -124,7 +124,7 @@ namespace entity_framework.Controllers
                 return NotFound();
             }
 
-            var endereco = await _context.enderecos
+            var endereco = await _context.Enderecos
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (endereco == null)
             {
@@ -139,15 +139,15 @@ namespace entity_framework.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var endereco = await _context.enderecos.FindAsync(id);
-            _context.enderecos.Remove(endereco);
+            var endereco = await _context.Enderecos.FindAsync(id);
+            _context.Enderecos.Remove(endereco);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool EnderecoExists(int id)
         {
-            return _context.enderecos.Any(e => e.Id == id);
+            return _context.Enderecos.Any(e => e.Id == id);
         }
     }
 }
