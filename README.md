@@ -3,6 +3,8 @@
   mkdir entity-framework
   cd entity-framework
   dotnet new mvc
+  dotnet new sln - Criar solução vazia
+  dotnet new classlib --name ClienteContexto
 ```
 
 # Comandos git:
@@ -50,4 +52,13 @@ dotnet tool install -g dotnet-aspnet-codegenerator
 ``` bash
 dotnet aspnet-codegenerator controller -name ClientesController -m Cliente -dc DbContexto --relativeFolderPath Controllers --useDefaultLayout
 ```
+# Comando para adicionar projetos a solução vazia
+A partir de uma solução criada digitamos o comando para adicionar a referencia ao csproj dos projetos
+ dotnet sln add src/entity-framework.csproj
 
+## Comando para adicionar referencia em outros projetos
+dotnet add reference ../entity-framework-mvc.csproj
+
+ # Gerando scaffold Contexto e Tabelas
+ ## Comando para o contexto Clientes
+  dotnet ef dbcontext scaffold "server=localhost;database=EntityFrameworkComunidade;user=root;password=root" Pomelo.EntityFrameworkCore.MySql -t clientes -t enderecos -f -c ClienteDbContexto -o Contexto
