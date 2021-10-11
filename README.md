@@ -49,6 +49,6 @@ dotnet tool install -g dotnet-aspnet-codegenerator
 # Gerando o scaffold de clientes
 ``` bash
 dotnet aspnet-codegenerator controller -name ClientesController -m Cliente -dc DbContexto --relativeFolderPath Controllers --useDefaultLayout
-```
+`
 
-Aíla Britogit status
+
