@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Entity.Produtos.Data;
+using Entity.Produtos.Entidades;
 
 #nullable disable
 
@@ -20,6 +20,8 @@ namespace Entity.Produtos.Data.Contexto
 
         public virtual DbSet<Produto> Produtos { get; set; }
         public virtual DbSet<Categoria> Categorias { get; set; }
+        public virtual DbSet<Fornecedor> Fornecedores { get; set; }
+        public virtual DbSet<Endereco> Enderecos { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using entity_framework.Servicos.Database;
+using Entity.Clientes.Data.Contexto;
+using Entity.Pedidos.Data.Contexto;
+using Entity.Produtos.Data.Contexto;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +23,10 @@ namespace entity_framework
         public void ConfigureServices(IServiceCollection services)
         {
             var connetionString = Configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<DbContexto>(options => options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString)));
+            //services.AddDbContext<DbContexto>(options => options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString)));
+            services.AddDbContext<ProdutosDbContexto>(options => options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString)));
+            services.AddDbContext<ClienteDbContexto>(options => options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString)));
+            services.AddDbContext<PedidosDbContexto>(options => options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString)));
             services.AddControllersWithViews();
         }
 

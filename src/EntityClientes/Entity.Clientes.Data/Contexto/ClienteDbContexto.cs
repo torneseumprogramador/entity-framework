@@ -1,10 +1,12 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Entity.Clientes.Domain.Entidades;
+using Entity.Clientes.Data.MapeamentoEntidades;
 
 #nullable disable
 
-namespace ClienteContexto.Contexto
+namespace Entity.Clientes.Data.Contexto
 {
     public partial class ClienteDbContexto : DbContext
     {
@@ -34,30 +36,32 @@ namespace ClienteContexto.Contexto
             modelBuilder.HasCharSet("utf8mb4")
                 .UseCollation("utf8mb4_0900_ai_ci");
 
-            modelBuilder.Entity<Cliente>(entity =>
-            {
-                entity.ToTable("clientes");
+            modelBuilder.ApplyConfiguration<Cliente>(new ClienteMapeamento());
 
-                entity.HasIndex(e => e.EnderecoId, "IX_clientes_endereco_id");
+            // modelBuilder.Entity<Cliente>(entity =>
+            // {
+            //     entity.ToTable("clientes");
 
-                entity.Property(e => e.Id).HasColumnName("id");
+            //     entity.HasIndex(e => e.EnderecoId, "IX_clientes_endereco_id");
 
-                entity.Property(e => e.EnderecoId).HasColumnName("endereco_id");
+            //     entity.Property(e => e.Id).HasColumnName("id");
 
-                entity.Property(e => e.Nome)
-                    .IsRequired()
-                    .HasMaxLength(150)
-                    .HasColumnName("nome");
+            //     entity.Property(e => e.EnderecoId).HasColumnName("endereco_id");
 
-                entity.Property(e => e.Observacao)
-                    .IsRequired()
-                    .HasColumnType("text")
-                    .HasColumnName("observacao");
+            //     entity.Property(e => e.Nome)
+            //         .IsRequired()
+            //         .HasMaxLength(150)
+            //         .HasColumnName("nome");
 
-                entity.HasOne(d => d.Endereco)
-                    .WithMany(p => p.Clientes)
-                    .HasForeignKey(d => d.EnderecoId);
-            });
+            //     entity.Property(e => e.Observacao)
+            //         .IsRequired()
+            //         .HasColumnType("text")
+            //         .HasColumnName("observacao");
+
+            //     entity.HasOne(d => d.Endereco)
+            //         .WithMany(p => p.Clientes)
+            //         .HasForeignKey(d => d.EnderecoId);
+            // });
 
             modelBuilder.Entity<Endereco>(entity =>
             {

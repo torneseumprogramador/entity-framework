@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace ClienteContexto.Contexto
+namespace Entity.Pedidos.Domain.Entidades
 {
     public partial class Endereco
     {
         public Endereco()
         {
-            Clientes = new HashSet<Cliente>();
+            Pedidos = new HashSet<Pedido>();
         }
 
         public int Id { get; set; }
@@ -21,6 +21,6 @@ namespace ClienteContexto.Contexto
         public string Cidade { get; set; }
         public string Estado { get; set; }
 
-        public virtual ICollection<Cliente> Clientes { get; set; }
+        public virtual ICollection<Pedido> Pedidos { get; set; }
     }
 }

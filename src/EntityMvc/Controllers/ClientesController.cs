@@ -5,17 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using entity_framework.Models;
-using entity_framework.Servicos.Database;
 using entity_framework.ModelViews;
+using Entity.Clientes.Data.Contexto;
+using Entity.Clientes.Domain.Entidades;
 
 namespace entity_framework.Controllers
 {
     public class ClientesController : Controller
     {
-        private readonly DbContexto _context;
+        private readonly ClienteDbContexto _context;
 
-        public ClientesController(DbContexto context)
+        public ClientesController(ClienteDbContexto context)
         {
             _context = context;
         }
@@ -89,18 +89,18 @@ namespace entity_framework.Controllers
             // };
 
 
-        var clientes = from c in _context.Clientes
-        where (
-            from p in _context.Pedidos
-            where p.ClienteId == c.Id
-            select p
-        ).Count() >= 2
-        select c.Nome;
+        // var clientes = from c in _context.Clientes
+        // where (
+        //     from p in _context.Pedidos
+        //     where p.ClienteId == c.Id
+        //     select p
+        // ).Count() >= 2
+        // select c.Nome;
 
-        foreach (var cli in clientes)
-        {
-            Console.WriteLine(cli);
-        }
+        // foreach (var cli in clientes)
+        // {
+        //     Console.WriteLine(cli);
+        // }
 
 
             var x = "";

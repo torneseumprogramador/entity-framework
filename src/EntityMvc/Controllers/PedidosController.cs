@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using entity_framework.Models;
-using entity_framework.Servicos.Database;
+using Entity.Pedidos.Data.Contexto;
+using Entity.Pedidos.Domain.Entidades;
 
 namespace entity_framework.Controllers
 {
     public class PedidosController : Controller
     {
-        private readonly DbContexto _context;
+        private readonly PedidosDbContexto _context;
 
-        public PedidosController(DbContexto context)
+        public PedidosController(PedidosDbContexto context)
         {
             _context = context;
         }
@@ -22,7 +22,9 @@ namespace entity_framework.Controllers
         // GET: Pedidos
         public async Task<IActionResult> Index()
         {
-            var dbContexto = _context.Pedidos.Include(p => p.Cliente).Include(p => p.Endereco);
+            var dbContexto = _context.Pedidos
+            //.Include(p => p.Cliente)
+            .Include(p => p.Endereco);
             return View(await dbContexto.ToListAsync());
         }
 
@@ -35,7 +37,7 @@ namespace entity_framework.Controllers
             }
 
             var pedido = await _context.Pedidos
-                .Include(p => p.Cliente)
+                //.Include(p => p.Cliente)
                 .Include(p => p.Endereco)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (pedido == null)
@@ -49,7 +51,7 @@ namespace entity_framework.Controllers
         // GET: Pedidos/Create
         public IActionResult Create()
         {
-            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome");
+            //ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome");
             ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro");
             return View();
         }
@@ -67,7 +69,7 @@ namespace entity_framework.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
+            //ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
             ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", pedido.EnderecoId);
             return View(pedido);
         }
@@ -85,7 +87,7 @@ namespace entity_framework.Controllers
             {
                 return NotFound();
             }
-            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
+            //ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
             ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", pedido.EnderecoId);
             return View(pedido);
         }
@@ -122,7 +124,7 @@ namespace entity_framework.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
+            //ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
             ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", pedido.EnderecoId);
             return View(pedido);
         }
@@ -136,7 +138,7 @@ namespace entity_framework.Controllers
             }
 
             var pedido = await _context.Pedidos
-                .Include(p => p.Cliente)
+                //.Include(p => p.Cliente)
                 .Include(p => p.Endereco)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (pedido == null)

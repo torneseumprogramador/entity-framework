@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using entity_framework.Models;
-using entity_framework.Servicos.Database;
+using Entity.Produtos.Data.Contexto;
+using Entity.Produtos.Entidades;
 
 namespace entity_framework.Controllers
 {
     public class ProdutosController : Controller
     {
-        private readonly DbContexto _context;
+        private readonly ProdutosDbContexto _context;
 
-        public ProdutosController(DbContexto context)
+        public ProdutosController(ProdutosDbContexto context)
         {
             _context = context;
         }

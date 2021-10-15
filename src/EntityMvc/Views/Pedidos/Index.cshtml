@@ -1,4 +1,4 @@
-@model IEnumerable<entity_framework.Models.Pedido>
+@model IEnumerable<Entity.Pedidos.Domain.Entidades.Pedido>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,7 +13,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Cliente)
+                @Html.DisplayNameFor(model => model.ClienteId)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Endereco)
@@ -31,7 +31,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Cliente.Nome)
+                @Html.DisplayFor(modelItem => item.ClienteId)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Endereco.Bairro)

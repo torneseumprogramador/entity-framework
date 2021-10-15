@@ -3,14 +3,15 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace ClienteContexto.Contexto
+namespace Entity.Pedidos.Domain.Entidades
 {
-    public partial class Cliente
+    public partial class Pedido
     {
         public int Id { get; set; }
-        public string Nome { get; set; }
-        public string Observacao { get; set; }
+        public int ClienteId { get; set; }
         public int EnderecoId { get; set; }
+        public double ValorTotal { get; set; }
+        public DateTime Data { get; set; }
 
         public virtual Endereco Endereco { get; set; }
     }

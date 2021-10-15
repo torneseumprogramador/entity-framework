@@ -6,15 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using entity_framework.Models;
-using entity_framework.Servicos.Database;
+using Entity.Clientes.Data.Contexto;
 
 namespace entity_framework.Controllers
 {
     public class EnderecosController : Controller
     {
-        private readonly DbContexto _context;
+        private readonly ClienteDbContexto _context;
 
-        public EnderecosController(DbContexto context)
+        public EnderecosController(ClienteDbContexto context)
         {
             _context = context;
         }

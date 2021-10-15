@@ -3,14 +3,16 @@ using System;
 using Entity.Produtos.Data.Contexto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Entity.Produtos.Data.Migrations
 {
     [DbContext(typeof(ProdutosDbContexto))]
-    partial class ProdutosDbContextoModelSnapshot : ModelSnapshot
+    [Migration("20211015020318_ContextoCompleto")]
+    partial class ContextoCompleto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
