@@ -7,11 +7,6 @@ namespace Entity.Clientes.Domain.Entidades
 {
     public partial class Endereco
     {
-        public Endereco()
-        {
-            Clientes = new HashSet<Cliente>();
-        }
-
         public int Id { get; set; }
         public string Logradouro { get; set; }
         public string Cep { get; set; }
