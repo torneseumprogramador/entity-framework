@@ -1,8 +1,8 @@
-using Entity.Pedidos.Domain.Entidades;
+using Entity.Produtos.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Entity.Pedidos.Data.MapeamentosEntidades
+namespace Entity.Produtos.Data.MapeamentosEntidades
 {
     public class EnderecoMapeamento : IEntityTypeConfiguration<Endereco>
     {
@@ -12,7 +12,7 @@ namespace Entity.Pedidos.Data.MapeamentosEntidades
 
             builder.HasKey(e => e.Id);
 
-             builder.HasIndex(e => e.Id, "IX_enderecos_id");
+            builder.HasIndex(e => e.Id, "IX_enderecos_id");
 
             builder.Property(e => e.Id)
                 .HasColumnName("id")
@@ -53,11 +53,10 @@ namespace Entity.Pedidos.Data.MapeamentosEntidades
                 .HasColumnType("varchar(2)")
                 .IsRequired();
 
-            //Relacionamento opcional
-            builder.HasMany(e => e.Pedidos)
-                .WithOne(c => c.Endereco)
-                .HasForeignKey(c => c.EnderecoId)
-                .HasConstraintName("FK_pedidos_enderecos_enderecoid");
+            builder.HasMany(e => e.Fornecedores)
+                .WithOne(f => f.Endereco)
+                .HasForeignKey(f => f.EnderecoId)
+                .HasConstraintName("FK_fornecedores_enderecos_endereco_id");
         }
     }
 }

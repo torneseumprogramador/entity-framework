@@ -12,7 +12,7 @@ namespace Entity.Clientes.Data.MapeamentoEntidades
 
             builder.HasKey(e => e.Id);
 
-            builder.HasIndex(e => e.Id, "enderecoid_idx");
+             builder.HasIndex(e => e.Id, "IX_enderecos_id");
 
             builder.Property(e => e.Id)
                 .HasColumnName("id")

@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Entity.Produtos.Entidades
 {
-    [Table("categorias")]
     public class Categoria
     {
         public Categoria()

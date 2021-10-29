@@ -1,11 +1,12 @@
 ﻿using System;
 using Entity.Clientes.Data.MapeamentoEntidades;
+using Entity.Clientes.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace Entity.Clientes.Domain.Entidades
+namespace Entity.Clientes.Data.Contexto
 {
     public partial class ClienteDbContexto : DbContext
     {

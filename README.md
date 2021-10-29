@@ -92,4 +92,6 @@ A partir de uma solução criada digitamos o comando para adicionar a referencia
 # Links utéis
 ``` bash
     Documentação CLI entity-framework-core : https://docs.microsoft.com/pt-br/ef/core/cli/dotnet
+    Documentação completa entity-framework : https://docs.microsoft.com/pt-br/ef/
+    Documentação auxiliar para uso da FluentAPI/Ef Core : https://www.entityframeworktutorial.net/
 ```

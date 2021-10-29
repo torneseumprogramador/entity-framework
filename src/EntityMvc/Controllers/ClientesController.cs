@@ -260,7 +260,10 @@ namespace entity_framework.Controllers
         {
             if (ModelState.IsValid)
             {
+
+                var clienteEstado = _context.Entry<Cliente>(cliente);
                 _context.Clientes.Add(cliente);
+                var changeTracker = _context.ChangeTracker;
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

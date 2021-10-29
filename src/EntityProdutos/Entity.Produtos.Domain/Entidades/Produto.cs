@@ -13,8 +13,10 @@ namespace Entity.Produtos.Entidades
         public string Descricao { get; set; }
         public double Valor { get; set; }
         public int CategoriaId {get;set;}
+        public int FornecedorId { get; set; }
 
         //EF - Relacionamento
         public virtual Categoria Categoria {get;set;}
+        public virtual Fornecedor Fornecedor { get; set; }
     }
 }
