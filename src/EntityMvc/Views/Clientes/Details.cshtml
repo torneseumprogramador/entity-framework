@@ -1,0 +1,85 @@
+@using entity_framework.ModelViews
+@model Entity.Clientes.Domain.Entidades.Cliente
+
+@{
+    ViewData["Title"] = "Details";
+    var pedidos = (List<ClientePedido>)ViewBag.pedidos;
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Cliente</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Nome)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Nome)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Observacao)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Observacao)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Endereco)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Endereco.Bairro)
+        </dd>
+    </dl>
+</div>
+
+<hr>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Cliente
+            </th>
+            <th>
+                Valor Total
+            </th>
+            <th>
+                Produto
+            </th>
+            <th>
+                Quantidade
+            </th>
+            <th>
+                Valor unidade
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var pedido in pedidos) {
+        <tr>
+            <td>
+                @pedido.Cliente
+            </td>
+            <td>
+                @pedido.ValorTotal
+            </td>
+            <td>
+                @pedido.Produto
+            </td>
+            <td>
+                @pedido.Quantidade
+            </td>
+            <td>
+                @pedido.Valor
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
