@@ -19,6 +19,9 @@
                 @Html.DisplayNameFor(model => model.Observacao)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.DataCadastro)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Endereco)
             </th>
             <th></th>
@@ -32,6 +35,9 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Observacao)
+            </td>
+            <td>
+                @item.DataCadastro?.ToString("dd/MM/yyyy")
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Endereco.Bairro)

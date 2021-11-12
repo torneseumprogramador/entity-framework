@@ -24,6 +24,12 @@
             @Html.DisplayFor(model => model.Observacao)
         </dd>
         <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DataCadastro)
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.DataCadastro?.ToString("dd/MM/yyyy")
+        </dd>
+        <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Endereco)
         </dt>
         <dd class = "col-sm-10">

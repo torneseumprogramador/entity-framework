@@ -3,6 +3,7 @@ using Entity.Clientes.Data.MapeamentoEntidades;
 using Entity.Clientes.Domain.Entidades;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Logging;
 
 #nullable disable
 
@@ -26,8 +27,13 @@ namespace Entity.Clientes.Data.Contexto
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql("server=localhost;database=EntityFrameworkComunidade;user=root;password=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.26-mysql"));
+                optionsBuilder.UseMySql("server=localhost;database=EntityFrameworkComunidade;user=root;password=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.26-mysql"))
+                .EnableSensitiveDataLogging()
+                  .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
             }
+
+            optionsBuilder.EnableSensitiveDataLogging()
+                .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

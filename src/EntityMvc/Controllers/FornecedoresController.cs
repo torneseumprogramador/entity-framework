@@ -87,6 +87,11 @@ namespace entity_framework.Controllers
             }
 
             var fornecedor = await _context.Fornecedores.FindAsync(id);
+
+            //Explicit Load 1 para muitos
+            if(_context.Entry(fornecedor).Collection(x => x.Produtos).IsLoaded)
+                await _context.Entry(fornecedor).Collection(x => x.Produtos).LoadAsync();
+
             if (fornecedor == null)
             {
                 return NotFound();

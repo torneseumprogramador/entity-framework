@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,13 +24,23 @@ namespace entity_framework.Controllers
         // GET: Clientes
         public async Task<IActionResult> Index()
         {
+            //Utilização de AsNoTracking para remover rastreio das entidades agilizando as consultas
             var listaClientes =  await _context.Clientes.Where(c => 
                 c.Nome.ToLower().Contains("d") && c.Nome.ToLower().Contains("o")
-            ).ToListAsync();
+            ).Select(x => new { Nome = x.Nome, Logradouro = x.Endereco.Logradouro}).ToListAsync();
 
+            var listaClientes2 =  await _context.Clientes.Where(c => 
+                c.Nome.ToLower().Contains("d") && c.Nome.ToLower().Contains("o")
+            ).Select(x => new { Cliente = x, Logradouro = x.Endereco.Logradouro}).AsNoTrackingWithIdentityResolution().ToListAsync();
 
             var dbContexto = _context.Clientes.Include(c => c.Endereco);
-            var lista = await dbContexto.ToListAsync();
+            var lista = await dbContexto.AsNoTrackingWithIdentityResolution().ToListAsync();
+
+            foreach (var cliente in lista)
+            {
+                if(cliente.DataCadastro == null)
+                    cliente.DataCadastro = DateTime.Now;
+            }
             return View(lista);
         }
 
@@ -260,7 +271,7 @@ namespace entity_framework.Controllers
         {
             if (ModelState.IsValid)
             {
-
+                cliente.DataCadastro = DateTime.Now;
                 var clienteEstado = _context.Entry<Cliente>(cliente);
                 _context.Clientes.Add(cliente);
                 var changeTracker = _context.ChangeTracker;

@@ -22,6 +22,22 @@ namespace entity_framework.Controllers
         // GET: Produtos
         public async Task<IActionResult> Index()
         {
+            _context.ChangeTracker.LazyLoadingEnabled = false;
+            //Consultas separadas a partir de multiplos joins, ponto de atenção que o entity julga quando necessário
+            var consulta = await _context.Produtos
+                                .Include(x => x.Categoria)
+                                .Include(x => x.Fornecedor)
+                                .ThenInclude(x => x.Endereco)
+                                .AsSplitQuery().ToListAsync();
+
+            //Eager Load - Carregamento adiantado
+             var consulta2 = await _context.Produtos
+                                .Include(x => x.Categoria)
+                                .Include(x => x.Fornecedor)
+                                .ThenInclude(x => x.Endereco)
+                                .AsSingleQuery().ToListAsync();
+
+            ViewData["CategoriaId"] = new SelectList(await _context.Categorias.ToListAsync(), "Id", "Descricao");
             return View(await _context.Produtos.ToListAsync());
         }
 
@@ -35,6 +51,11 @@ namespace entity_framework.Controllers
 
             var produto = await _context.Produtos
                 .FirstOrDefaultAsync(m => m.Id == id);
+            
+            //Explicit Load 1 para 1 - Carregamento explicito dos relacionamentos
+            if(_context.Entry(produto).Reference(x => x.Categoria).IsLoaded)
+                await _context.Entry(produto).Reference(x => x.Categoria).LoadAsync();
+
             if (produto == null)
             {
                 return NotFound();
@@ -44,8 +65,9 @@ namespace entity_framework.Controllers
         }
 
         // GET: Produtos/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewData["CategoriaId"] = new SelectList(await _context.Categorias.ToListAsync(), "Id", "Descricao");
             return View();
         }
 
@@ -54,10 +76,11 @@ namespace entity_framework.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,UrlImagem,Descricao,Valor")] Produto produto)
+        public async Task<IActionResult> Create([Bind("Id,Nome,UrlImagem,Descricao,Valor,CategoriaId")] Produto produto)
         {
             if (ModelState.IsValid)
             {
+                produto.FornecedorId = 2;
                 _context.Add(produto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
