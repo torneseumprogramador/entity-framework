@@ -6,35 +6,35 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using entity_framework.ModelViews;
-using Entity.Clientes.Data.Contexto;
 using Entity.Clientes.Domain.Entidades;
+using Entity.Clientes.Domain.Repositories;
 
 namespace entity_framework.Controllers
 {
     public class ClientesController : Controller
     {
-        private readonly ClienteDbContexto _context;
+        private readonly IClienteRepository _clienteRepository;
 
-        public ClientesController(ClienteDbContexto context)
+        public ClientesController(IClienteRepository clienteRepository)
         {
-            _context = context;
+            _clienteRepository = clienteRepository;
         }
 
         // GET: Clientes
         public async Task<IActionResult> Index()
         {
             //Utilização de AsNoTracking para remover rastreio das entidades agilizando as consultas
-            var listaClientes =  await _context.Clientes.Where(c => 
+            var listaClientes = (await _clienteRepository.BuscarTodosComEndereco()).Where(c => 
                 c.Nome.ToLower().Contains("d") && c.Nome.ToLower().Contains("o")
-            ).Select(x => new { Nome = x.Nome, Logradouro = x.Endereco.Logradouro}).ToListAsync();
+            ).Select(x => new { Nome = x.Nome, Logradouro = x.Endereco.Logradouro}).ToList();
 
-            var listaClientes2 =  await _context.Clientes.Where(c => 
+            var listaClientes2 =  (await _clienteRepository.BuscarTodosComEndereco()).Where(c => 
                 c.Nome.ToLower().Contains("d") && c.Nome.ToLower().Contains("o")
-            ).Select(x => new { Cliente = x, Logradouro = x.Endereco.Logradouro}).AsNoTrackingWithIdentityResolution().ToListAsync();
+            ).Select(x => new { Cliente = x, Logradouro = x.Endereco.Logradouro}).ToList();
 
-            var dbContexto = _context.Clientes.Include(c => c.Endereco);
-            var lista = await dbContexto.AsNoTrackingWithIdentityResolution().ToListAsync();
+            // var dbContexto = _clienteRepository.Clientes.Include(c => c.Endereco);
+            // var lista = await dbContexto.AsNoTrackingWithIdentityResolution().ToListAsync();
+            var lista = await _clienteRepository.BuscarTodosComEndereco();
 
             foreach (var cliente in lista)
             {
@@ -45,27 +45,20 @@ namespace entity_framework.Controllers
         }
 
         // GET: Clientes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var cliente = await _context.Clientes
-                .Include(c => c.Endereco)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var cliente = await _clienteRepository.BuscarClienteEndereco(id);
             if (cliente == null)
             {
                 return NotFound();
             }
 
 
-            // var clientes = from c in _context.Clientes
-            //     join e in _context.Enderecos on c.EnderecoId equals e.Id
-            //     join p in _context.Pedidos on c.Id equals p.ClienteId
-            //     join pp in _context.PedidosProdutos on p.Id equals pp.PedidoId
-            //     join produto in _context.Produtos on pp.ProdutoId equals produto.Id
+            // var clientes = from c in _clienteRepository.Clientes
+            //     join e in _clienteRepository.Enderecos on c.EnderecoId equals e.Id
+            //     join p in _clienteRepository.Pedidos on c.Id equals p.ClienteId
+            //     join pp in _clienteRepository.PedidosProdutos on p.Id equals pp.PedidoId
+            //     join produto in _clienteRepository.Produtos on pp.ProdutoId equals produto.Id
             //     where c.Nome == "Danilo" && c.Id == 1
             //     select new {
             //         Nome = c.Nome,
@@ -81,17 +74,17 @@ namespace entity_framework.Controllers
             // }
 
 
-            // var clientes = from c in _context.Clientes
-            // join p in _context.Pedidos on c.Id equals p.ClienteId
+            // var clientes = from c in _clienteRepository.Clientes
+            // join p in _clienteRepository.Pedidos on c.Id equals p.ClienteId
             // group p by c.Nome into grouping
             // select new {
             //     Nome = grouping.Key,
             //     Total = grouping.Sum( g => g.ValorTotal)
             // };
 
-            // var clientes = from c in _context.Clientes
-            // join p in _context.Pedidos on c.Id equals p.ClienteId
-            // join pp in _context.PedidosProdutos on p.Id equals pp.PedidoId
+            // var clientes = from c in _clienteRepository.Clientes
+            // join p in _clienteRepository.Pedidos on c.Id equals p.ClienteId
+            // join pp in _clienteRepository.PedidosProdutos on p.Id equals pp.PedidoId
             // group p by new { c.Nome, pp.Quantidade } into grouping
             // select new {
             //     Nome = grouping.Key.Nome,
@@ -100,9 +93,9 @@ namespace entity_framework.Controllers
             // };
 
 
-        // var clientes = from c in _context.Clientes
+        // var clientes = from c in _clienteRepository.Clientes
         // where (
-        //     from p in _context.Pedidos
+        //     from p in _clienteRepository.Pedidos
         //     where p.ClienteId == c.Id
         //     select p
         // ).Count() >= 2
@@ -119,9 +112,9 @@ namespace entity_framework.Controllers
 
             
 
-            // var pedidosContext = _context.Clientes;
+            // var pedidosContext = _clienteRepository.Clientes;
             // var pedidosSql = pedidosContext.Join(
-            //     _context.Pedidos,
+            //     _clienteRepository.Pedidos,
             //     cli => cli.Id,
             //     ped => ped.ClienteId,
             //     (cli, ped) => new ClientePedido {
@@ -134,7 +127,7 @@ namespace entity_framework.Controllers
             // }).ToQueryString();
 
             //  var pedidos = await pedidosContext.Join(
-            //     _context.Pedidos,
+            //     _clienteRepository.Pedidos,
             //     cli => cli.Id,
             //     ped => ped.ClienteId,
             //     (cli, ped) => new ClientePedido {
@@ -148,10 +141,10 @@ namespace entity_framework.Controllers
 
 
             /*
-            using(var command = _context.Database.GetDbConnection().CreateCommand())
+            using(var command = _clienteRepository.Database.GetDbConnection().CreateCommand())
             {
                 command.CommandText = "SELECT clientes.nome, sum(pedidos.valor_total) as valor_total FROM pedidos inner join clientes on clientes.id = pedidos.cliente_id group by clientes.id";
-                _context.Database.OpenConnection();
+                _clienteRepository.Database.OpenConnection();
 
                 using(var result = await command.ExecuteReaderAsync())
                 {
@@ -166,10 +159,10 @@ namespace entity_framework.Controllers
 
                     ViewBag.pedidos = pedidos_agrupados;
                 }
-                _context.Database.CloseConnection();
+                _clienteRepository.Database.CloseConnection();
             }*/
 
-            /*using(var command = _context.Database.GetDbConnection().CreateCommand())
+            /*using(var command = _clienteRepository.Database.GetDbConnection().CreateCommand())
             {
                 command.CommandText = "select clientes.nome as cliente, pedidos.valor_total, produtos.nome as produto, pedidos_produtos.quantidade, pedidos_produtos.valor  " +
                     "from clientes " + 
@@ -177,7 +170,7 @@ namespace entity_framework.Controllers
                     "inner join pedidos_produtos on pedidos_produtos.pedido_id = pedidos.id " +
                     "inner join produtos on produtos.id = pedidos_produtos.produto_id " +
                     "where clientes.id = " + cliente.Id;
-                _context.Database.OpenConnection();
+                _clienteRepository.Database.OpenConnection();
 
                 using(var result = await command.ExecuteReaderAsync())
                 {
@@ -195,12 +188,12 @@ namespace entity_framework.Controllers
 
                     ViewBag.pedidos = pedidos;
                 }
-                _context.Database.CloseConnection();
+                _clienteRepository.Database.CloseConnection();
             }*/
 
-            /*var pedidosContext = _context.Clientes.Where(c => c.Id  == cliente.Id);
+            /*var pedidosContext = _clienteRepository.Clientes.Where(c => c.Id  == cliente.Id);
             var pedidos =  pedidosContext.Join(
-                _context.Pedidos,
+                _clienteRepository.Pedidos,
                 cli => cli.Id,
                 ped => ped.ClienteId,
                 (cli, ped) => new ClientePedido {
@@ -209,7 +202,7 @@ namespace entity_framework.Controllers
                     PedidoId = ped.Id
                 }
             ).Join(
-                _context.PedidosProdutos,
+                _clienteRepository.PedidosProdutos,
                 pCliente => pCliente.PedidoId,
                 pp => pp.PedidoId,
                 (pCliente, pp) => new ClientePedido {
@@ -221,7 +214,7 @@ namespace entity_framework.Controllers
                     ProdutoId = pp.ProdutoId,
                 }
             ).Join(
-                _context.Produtos,
+                _clienteRepository.Produtos,
                 pCliente => pCliente.ProdutoId,
                 produto => produto.Id,
                 (pCliente, produto) => new ClientePedido {
@@ -256,9 +249,9 @@ namespace entity_framework.Controllers
         }
 
         // GET: Clientes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro");
+            ViewData["EnderecoId"] = new SelectList(await BuscarEnderecosClientes(), "Id", "Bairro");
             return View();
         }
 
@@ -272,30 +265,31 @@ namespace entity_framework.Controllers
             if (ModelState.IsValid)
             {
                 cliente.DataCadastro = DateTime.Now;
-                var clienteEstado = _context.Entry<Cliente>(cliente);
-                _context.Clientes.Add(cliente);
-                var changeTracker = _context.ChangeTracker;
-                await _context.SaveChangesAsync();
+
+                //Manipulação change tracker
+                // var clienteEstado = _clienteRepository.Entry<Cliente>(cliente);
+                // _clienteRepository.Clientes.Add(cliente);
+                // var changeTracker = _clienteRepository.ChangeTracker;
+                // await _clienteRepository.SaveChangesAsync();
+
+                _clienteRepository.Adicionar(cliente);
+                await _clienteRepository.UnitOfWork.Commit();
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", cliente.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(await BuscarEnderecosClientes(), "Id", "Bairro", cliente.EnderecoId);
             return View(cliente);
         }
 
         // GET: Clientes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var cliente = await _context.Clientes.FindAsync(id);
+            var cliente = await _clienteRepository.BuscarClienteEndereco(id);
             if (cliente == null)
             {
                 return NotFound();
             }
-            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", cliente.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(await BuscarEnderecosClientes(), "Id", "Bairro", cliente.EnderecoId);
             return View(cliente);
         }
 
@@ -315,12 +309,14 @@ namespace entity_framework.Controllers
             {
                 try
                 {
-                    _context.Update(cliente);
-                    await _context.SaveChangesAsync();
+                    // _clienteRepository.Update(cliente);
+                    // await _clienteRepository.SaveChangesAsync();
+                    _clienteRepository.Atualizar(cliente);
+                    await _clienteRepository.UnitOfWork.Commit();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ClienteExists(cliente.Id))
+                    if (!await ClienteExists(cliente.Id))
                     {
                         return NotFound();
                     }
@@ -331,21 +327,14 @@ namespace entity_framework.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", cliente.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(await BuscarEnderecosClientes(), "Id", "Bairro", cliente.EnderecoId);
             return View(cliente);
         }
 
         // GET: Clientes/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var cliente = await _context.Clientes
-                .Include(c => c.Endereco)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var cliente = await _clienteRepository.BuscarClienteEndereco(id);
             if (cliente == null)
             {
                 return NotFound();
@@ -359,15 +348,17 @@ namespace entity_framework.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
-            _context.Clientes.Remove(cliente);
-            await _context.SaveChangesAsync();
+            // var cliente = await _clienteRepository.Clientes.FindAsync(id);
+            // _clienteRepository.Clientes.Remove(cliente);
+            // await _clienteRepository.SaveChangesAsync();
+            var cliente = await _clienteRepository.BuscarClienteEndereco(id);
+            _clienteRepository.Deletar(cliente);
+            await _clienteRepository.UnitOfWork.Commit();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ClienteExists(int id)
-        {
-            return _context.Clientes.Any(e => e.Id == id);
-        }
+        private async Task<bool> ClienteExists(int id) => await _clienteRepository.ClienteExiste(id);
+        private async Task<IEnumerable<Endereco>> BuscarEnderecosClientes() =>
+            await _clienteRepository.BuscarEnderecos();
     }
 }
