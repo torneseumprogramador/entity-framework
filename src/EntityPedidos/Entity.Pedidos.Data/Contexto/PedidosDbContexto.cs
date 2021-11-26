@@ -1,14 +1,13 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Entity.Pedidos.Data;
+﻿using Microsoft.EntityFrameworkCore;
 using Entity.Pedidos.Domain.Entidades;
+using Entity.Pedidos.Domain.Repositories;
+using System.Threading.Tasks;
 
 #nullable disable
 
 namespace Entity.Pedidos.Data.Contexto
 {
-    public partial class PedidosDbContexto : DbContext
+    public partial class PedidosDbContexto : DbContext, IUnitOfWork
     {
         public PedidosDbContexto()
         {
@@ -43,5 +42,7 @@ namespace Entity.Pedidos.Data.Contexto
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+        public async Task<bool> Commit() => await base.SaveChangesAsync() > 0;
     }
 }

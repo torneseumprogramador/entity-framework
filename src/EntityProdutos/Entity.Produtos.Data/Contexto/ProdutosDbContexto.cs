@@ -3,12 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Entity.Produtos.Entidades;
 using Microsoft.Extensions.Logging;
+using Entity.Produtos.Domain.Repositories;
+using System.Threading.Tasks;
 
 #nullable disable
 
 namespace Entity.Produtos.Data.Contexto
 {
-    public partial class ProdutosDbContexto : DbContext
+    public partial class ProdutosDbContexto : DbContext, IUnitOfWork
     {
         public ProdutosDbContexto()
         {
@@ -48,5 +50,7 @@ namespace Entity.Produtos.Data.Contexto
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+        public async Task<bool> Commit() => await base.SaveChangesAsync() > 0;
     }
 }
