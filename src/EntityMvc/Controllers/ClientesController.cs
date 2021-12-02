@@ -8,16 +8,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Entity.Clientes.Domain.Entidades;
 using Entity.Clientes.Domain.Repositories;
+using Entity.Shared.Mediator;
+using Entity.Clientes.Application.Events;
 
 namespace entity_framework.Controllers
 {
     public class ClientesController : Controller
     {
         private readonly IClienteRepository _clienteRepository;
+        private readonly IMediatorHandler _mediator;
 
-        public ClientesController(IClienteRepository clienteRepository)
+        public ClientesController(IClienteRepository clienteRepository, IMediatorHandler mediator)
         {
             _clienteRepository = clienteRepository;
+            _mediator = mediator;
         }
 
         // GET: Clientes
@@ -260,7 +264,7 @@ namespace entity_framework.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nome,Observacao,EnderecoId")] Cliente cliente)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Email,Observacao,EnderecoId")] Cliente cliente)
         {
             if (ModelState.IsValid)
             {
@@ -274,6 +278,7 @@ namespace entity_framework.Controllers
 
                 _clienteRepository.Adicionar(cliente);
                 await _clienteRepository.UnitOfWork.Commit();
+                await _mediator.PublicarEvento(new ClienteRegistradoEvento(cliente.Nome, cliente.DataCadastro, cliente.Email));
 
                 return RedirectToAction(nameof(Index));
             }

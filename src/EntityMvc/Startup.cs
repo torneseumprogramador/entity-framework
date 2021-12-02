@@ -1,12 +1,15 @@
+using Entity.Clientes.Application.Handlers;
 using Entity.Clientes.Data.Contexto;
 using Entity.Clientes.Data.Repositories;
 using Entity.Clientes.Domain.Repositories;
 using Entity.Pedidos.Data.Contexto;
 using Entity.Pedidos.Data.Repositories;
 using Entity.Pedidos.Domain.Repositories;
+using Entity.Produtos.Application.Handlers;
 using Entity.Produtos.Data.Contexto;
 using Entity.Produtos.Data.Repositories;
 using Entity.Produtos.Domain.Repositories;
+using Entity.Shared.Mediator;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +45,15 @@ namespace entity_framework
             services.AddScoped<IPedidosRepository, PedidosRepository>();
             services.AddScoped<IProdutosRepository, ProdutosRepository>();
             services.AddScoped<IFornecedoresRepository, FornecedoresRepository>();
+
+            //eventos
+            services.AddSingleton<IMediatorHandler, MediatorHandler>((_) => 
+            {
+                var mediator = new MediatorHandler();
+                mediator.RegistrarEventoHandler(new ClienteRegistradoEventoHandler());
+                mediator.RegistrarEventoHandler(new ProdutosPedidosEventoHandler());
+                return mediator;
+            });
 
             services.AddControllersWithViews();
         }

@@ -4,16 +4,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Entity.Pedidos.Domain.Entidades;
 using Entity.Pedidos.Domain.Repositories;
+using Entity.Shared.Mediator;
+using Entity.Shared.IntegracaoEventos;
 
 namespace entity_framework.Controllers
 {
     public class PedidosController : Controller
     {
          private readonly IPedidosRepository _pedidosRepository;
+        private readonly IMediatorHandler _mediator;
 
-        public PedidosController(IPedidosRepository pedidosRepository)
+        public PedidosController(IPedidosRepository pedidosRepository, IMediatorHandler mediator)
         {
             _pedidosRepository = pedidosRepository;
+            _mediator = mediator;
         }
 
         public async Task<IActionResult> Index()
@@ -47,6 +51,8 @@ namespace entity_framework.Controllers
             {
                 _pedidosRepository.Adicionar(pedido);
                 await _pedidosRepository.UnitOfWork.Commit();
+                await _mediator.PublicarEvento(new PedidoFinalizadoEvento(pedido.Id, pedido.Codigo, pedido.ClienteId,
+                pedido.Data, pedido.Desconto, pedido.ValorTotal));
                 return RedirectToAction(nameof(Index));
             }
             

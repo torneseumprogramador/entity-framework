@@ -65,10 +65,10 @@ namespace Entity.Pedidos.Data.MapeamentosEntidades
                 .IsRequired();
 
             //Opcional já que pedido guarda a chave estrangeira
-            builder.HasMany(c => c.Pedidos)
-                .WithOne(c => c.CupomDesconto)
-                .HasForeignKey(c => c.CupomDescontoId)
-                .HasConstraintName("FK_pedidos_cupons_descontos_cupom_desconto_id");
+            // builder.HasMany(c => c.Pedidos)
+            //     .WithOne(c => c.CupomDesconto)
+            //     .HasForeignKey(c => c.CupomDescontoId)
+            //     .HasConstraintName("FK_pedidos_cupons_descontos_cupom_desconto_id");
         }
     }
 }

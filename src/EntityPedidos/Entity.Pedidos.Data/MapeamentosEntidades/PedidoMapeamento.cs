@@ -58,10 +58,10 @@ namespace Entity.Pedidos.Data.MapeamentosEntidades
                 .HasColumnName("cupom_desconto_id")
                 .HasColumnType("int");
 
-            builder.HasOne(p => p.CupomDesconto)
-                .WithMany(c => c.Pedidos)
-                .HasForeignKey(p => p.CupomDescontoId)
-                .HasConstraintName("FK_pedidos_cupons_descontos_cupom_desconto_id");
+            // builder.HasOne(p => p.CupomDesconto)
+            //     .WithMany(c => c.Pedidos)
+            //     .HasForeignKey(p => p.CupomDescontoId)
+            //     .HasConstraintName("FK_pedidos_cupons_descontos_cupom_desconto_id");
 
             builder.HasOne(p => p.Endereco)
                 .WithMany(e => e.Pedidos)
