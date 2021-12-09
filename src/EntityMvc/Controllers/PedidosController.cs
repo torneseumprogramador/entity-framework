@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -6,12 +7,13 @@ using Entity.Pedidos.Domain.Entidades;
 using Entity.Pedidos.Domain.Repositories;
 using Entity.Shared.Mediator;
 using Entity.Shared.IntegracaoEventos;
+using Entity.Pedidos.Application.Commands;
 
 namespace entity_framework.Controllers
 {
     public class PedidosController : Controller
     {
-         private readonly IPedidosRepository _pedidosRepository;
+        private readonly IPedidosRepository _pedidosRepository;
         private readonly IMediatorHandler _mediator;
 
         public PedidosController(IPedidosRepository pedidosRepository, IMediatorHandler mediator)
@@ -49,8 +51,8 @@ namespace entity_framework.Controllers
         {
             if (ModelState.IsValid)
             {
-                _pedidosRepository.Adicionar(pedido);
-                await _pedidosRepository.UnitOfWork.Commit();
+                await _mediator.EnviarComando(new CadastrarPedidoComando(pedido.Codigo, pedido.ClienteId, pedido.EnderecoId, pedido.Desconto
+                , pedido.ValorTotal, null, PedidoStatus.Rascunho));
                 await _mediator.PublicarEvento(new PedidoFinalizadoEvento(pedido.Id, pedido.Codigo, pedido.ClienteId,
                 pedido.Data, pedido.Desconto, pedido.ValorTotal));
                 return RedirectToAction(nameof(Index));
@@ -84,8 +86,8 @@ namespace entity_framework.Controllers
             {
                 try
                 {
-                    _pedidosRepository.Atualizar(pedido);
-                    await _pedidosRepository.UnitOfWork.Commit();
+                    await _mediator.EnviarComando(new AtualizarPedidoComando(id,pedido.Codigo, pedido.ClienteId, pedido.EnderecoId
+                    , pedido.Desconto, pedido.ValorTotal, null, DateTime.Now, PedidoStatus.Iniciado));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -120,9 +122,7 @@ namespace entity_framework.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var pedido = await _pedidosRepository.Buscar(id);
-            _pedidosRepository.Deletar(pedido);
-            await _pedidosRepository.UnitOfWork.Commit();
+            await _mediator.EnviarComando(new RemoverPedidoComando(id));
             return RedirectToAction(nameof(Index));
         }
 

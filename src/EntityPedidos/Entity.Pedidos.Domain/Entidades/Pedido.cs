@@ -21,7 +21,7 @@ namespace Entity.Pedidos.Domain.Entidades
         public decimal Desconto {get;set;}
         public decimal ValorTotal { get; set; }
         public DateTime Data { get; set; }
-        public int CupomDescontoId {get;set;}
+        public int? CupomDescontoId {get;set;}
         public PedidoStatus PedidoStatus {get;set;}
     
         //EF- relacionamentos
