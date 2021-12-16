@@ -16,6 +16,7 @@ namespace Entity.Produtos.Entidades
         public int FornecedorId { get; set; }
 
         //EF - Relacionamento
+        //Ao definir uma propriedade de navegação com virtual estamos habilitando o lazy load
         public virtual Categoria Categoria {get;set;}
         public virtual Fornecedor Fornecedor { get; set; }
     }

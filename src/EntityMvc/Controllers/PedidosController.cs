@@ -1,45 +1,36 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Entity.Pedidos.Data.Contexto;
 using Entity.Pedidos.Domain.Entidades;
+using Entity.Pedidos.Domain.Repositories;
+using Entity.Shared.Mediator;
+using Entity.Shared.IntegracaoEventos;
+using Entity.Pedidos.Application.Commands;
 
 namespace entity_framework.Controllers
 {
     public class PedidosController : Controller
     {
-        private readonly PedidosDbContexto _context;
+        private readonly IPedidosRepository _pedidosRepository;
+        private readonly IMediatorHandler _mediator;
 
-        public PedidosController(PedidosDbContexto context)
+        public PedidosController(IPedidosRepository pedidosRepository, IMediatorHandler mediator)
         {
-            _context = context;
+            _pedidosRepository = pedidosRepository;
+            _mediator = mediator;
         }
 
-        // GET: Pedidos
         public async Task<IActionResult> Index()
         {
-            var dbContexto = _context.Pedidos
-            //.Include(p => p.Cliente)
-            .Include(p => p.Endereco);
-            return View(await dbContexto.ToListAsync());
+            return View(await _pedidosRepository.BuscarTodosComEndereco());
         }
 
-        // GET: Pedidos/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var pedido = await _context.Pedidos
-                //.Include(p => p.Cliente)
-                .Include(p => p.Endereco)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var pedido = await _pedidosRepository.Buscar(id);
             if (pedido == null)
             {
                 return NotFound();
@@ -48,53 +39,40 @@ namespace entity_framework.Controllers
             return View(pedido);
         }
 
-        // GET: Pedidos/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            //ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome");
-            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro");
+            ViewData["EnderecoId"] = new SelectList(await _pedidosRepository.BuscarEnderecos(), "Id", "Bairro");
             return View();
         }
 
-        // POST: Pedidos/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ClienteId,EnderecoId,ValorTotal,Data")] Pedido pedido)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(pedido);
-                await _context.SaveChangesAsync();
+                await _mediator.EnviarComando(new CadastrarPedidoComando(pedido.Codigo, pedido.ClienteId, pedido.EnderecoId, pedido.Desconto
+                , pedido.ValorTotal, null, PedidoStatus.Rascunho));
+                await _mediator.PublicarEvento(new PedidoFinalizadoEvento(pedido.Id, pedido.Codigo, pedido.ClienteId,
+                pedido.Data, pedido.Desconto, pedido.ValorTotal));
                 return RedirectToAction(nameof(Index));
             }
-            //ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
-            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", pedido.EnderecoId);
+            
+            ViewData["EnderecoId"] = new SelectList(await _pedidosRepository.BuscarEnderecos(), "Id", "Bairro", pedido.EnderecoId);
             return View(pedido);
         }
 
-        // GET: Pedidos/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var pedido = await _context.Pedidos.FindAsync(id);
+            var pedido = await _pedidosRepository.Buscar(id);
             if (pedido == null)
             {
                 return NotFound();
             }
-            //ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
-            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", pedido.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(await _pedidosRepository.BuscarEnderecos(), "Id", "Bairro", pedido.EnderecoId);
             return View(pedido);
         }
 
-        // POST: Pedidos/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ClienteId,EnderecoId,ValorTotal,Data")] Pedido pedido)
@@ -108,12 +86,12 @@ namespace entity_framework.Controllers
             {
                 try
                 {
-                    _context.Update(pedido);
-                    await _context.SaveChangesAsync();
+                    await _mediator.EnviarComando(new AtualizarPedidoComando(id,pedido.Codigo, pedido.ClienteId, pedido.EnderecoId
+                    , pedido.Desconto, pedido.ValorTotal, null, DateTime.Now, PedidoStatus.Iniciado));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PedidoExists(pedido.Id))
+                    if (!await PedidoExists(pedido.Id))
                     {
                         return NotFound();
                     }
@@ -124,23 +102,14 @@ namespace entity_framework.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            //ViewData["ClienteId"] = new SelectList(_context.Clientes, "Id", "Nome", pedido.ClienteId);
-            ViewData["EnderecoId"] = new SelectList(_context.Enderecos, "Id", "Bairro", pedido.EnderecoId);
+            ViewData["EnderecoId"] = new SelectList(await _pedidosRepository.BuscarEnderecos(), "Id", "Bairro", pedido.EnderecoId);
             return View(pedido);
         }
 
-        // GET: Pedidos/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var pedido = await _context.Pedidos
-                //.Include(p => p.Cliente)
-                .Include(p => p.Endereco)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var pedido = await _pedidosRepository.BuscarComEndereco(id);
             if (pedido == null)
             {
                 return NotFound();
@@ -149,20 +118,14 @@ namespace entity_framework.Controllers
             return View(pedido);
         }
 
-        // POST: Pedidos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var pedido = await _context.Pedidos.FindAsync(id);
-            _context.Pedidos.Remove(pedido);
-            await _context.SaveChangesAsync();
+            await _mediator.EnviarComando(new RemoverPedidoComando(id));
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PedidoExists(int id)
-        {
-            return _context.Pedidos.Any(e => e.Id == id);
-        }
+        private async Task<bool> PedidoExists(int id) => await _pedidosRepository.PedidoExiste(id);
     }
 }

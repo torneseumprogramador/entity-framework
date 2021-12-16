@@ -26,8 +26,16 @@ namespace Entity.Clientes.Data.MapeamentoEntidades
                 .HasColumnType("text")
                 .IsRequired();
 
+            builder.Property(x => x.Email)
+                .HasColumnName("email")
+                .HasColumnType("varchar(200)");
+
+            builder.Property(x => x.DataCadastro)
+                .HasColumnName("data_cadastro")
+                .HasColumnType("datetime(6)");
+
             builder.Property(x => x.EnderecoId)
-                .HasColumnName("id")
+                .HasColumnName("endereco_id")
                 .HasColumnType("int")
                 .IsRequired();
 

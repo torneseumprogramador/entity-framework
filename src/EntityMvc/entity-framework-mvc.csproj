@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.8">
@@ -14,6 +15,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.13" />
   </ItemGroup>
 
 
@@ -21,6 +23,10 @@
     <ProjectReference Include="..\EntityClientes\Entity.Clientes.Data\Entity.Clientes.Data.csproj" />
     <ProjectReference Include="..\EntityProdutos\Entity.Produtos.Data\Entity.Produtos.Data.csproj" />
     <ProjectReference Include="..\EntityPedidos\Entity.Pedidos.Data\Entity.Pedidos.Data.csproj" />
+    <ProjectReference Include="..\Entity.Shared\Entity.Shared.csproj" />
+    <ProjectReference Include="..\EntityClientes\Entity.Clientes.Application\Entity.Clientes.Application.csproj" />
+    <ProjectReference Include="..\EntityProdutos\Entity.Produtos.Application\Entity.Produtos.Application.csproj" />
+    <ProjectReference Include="..\EntityPedidos\Entity.Pedidos.Application\Entity.Pedidos.Application.csproj" />
   </ItemGroup>
 
 </Project>

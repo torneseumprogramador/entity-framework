@@ -25,6 +25,7 @@
   dotnet add package Microsoft.EntityFrameworkCore --version 5.0.8
   dotnet add package Microsoft.EntityFrameworkCore.Tools --version 5.0.8
   dotnet add package Pomelo.EntityFrameworkCore.MySql --version 5.0.1
+  dotnet add package Microsoft.Extensions.DependencyInjection --injeção de dependencia
 ```
 
 # Instalando mysql no servidor

@@ -2,12 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Entity.Produtos.Entidades;
+using Microsoft.Extensions.Logging;
+using Entity.Produtos.Domain.Repositories;
+using System.Threading.Tasks;
 
 #nullable disable
 
 namespace Entity.Produtos.Data.Contexto
 {
-    public partial class ProdutosDbContexto : DbContext
+    public partial class ProdutosDbContexto : DbContext, IUnitOfWork
     {
         public ProdutosDbContexto()
         {
@@ -27,8 +30,13 @@ namespace Entity.Produtos.Data.Contexto
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseMySql("server=localhost;database=EntityFrameworkComunidade;user=root;password=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.26-mysql"));
+                optionsBuilder.UseMySql("server=localhost;database=EntityFrameworkComunidade;user=root;password=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.26-mysql"))
+                .EnableSensitiveDataLogging()
+                  .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));;
             }
+
+            optionsBuilder.EnableSensitiveDataLogging()
+                .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -42,5 +50,7 @@ namespace Entity.Produtos.Data.Contexto
         }
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+
+        public async Task<bool> Commit() => await base.SaveChangesAsync() > 0;
     }
 }
