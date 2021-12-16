@@ -10,11 +10,12 @@ namespace Entity.Produtos.Domain.Repositories
         IUnitOfWork UnitOfWork { get;}
 
         Task<IEnumerable<Fornecedor>> BuscarTodos();
+        Task<bool> FornecedorExiste(int id);
+        Task<IEnumerable<Endereco>> BuscarEnderecos();
         Task<Fornecedor> Buscar(int id);
+        Task<Fornecedor> BuscarPorDocumento(string nome);
         void Adicionar(Fornecedor fornecedor);
         void Deletar(Fornecedor fornecedor);
         void Atualizar(Fornecedor fornecedor);
-        Task<IEnumerable<Endereco>> BuscarEnderecos();
-        Task<bool> FornecedorExiste(int id);
     }
 }

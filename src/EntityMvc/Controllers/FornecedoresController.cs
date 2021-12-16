@@ -3,27 +3,33 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Entity.Produtos.Entidades;
-using Entity.Produtos.Domain.Repositories;
+using Entity.Produtos.Application.Queries;
+using Entity.Shared.Mediator;
+using Entity.Produtos.Application.Commands;
+using Entity.Produtos.Application.Events;
 
 namespace entity_framework.Controllers
 {
     public class FornecedoresController : Controller
     {
-        private readonly IFornecedoresRepository _fornecedoresRepository;
+        private readonly IFornecedoresQueries _fornecedoresQueries;
+        private readonly IMediatorBibliotecaHandler _mediator;
 
-        public FornecedoresController(IFornecedoresRepository fornecedoresRepository)
+        public FornecedoresController(IFornecedoresQueries fornecedoresQueries, 
+                                        IMediatorBibliotecaHandler mediator)
         {
-            _fornecedoresRepository = fornecedoresRepository;
+            _fornecedoresQueries = fornecedoresQueries;
+            _mediator = mediator;
         }
 
         public async Task<IActionResult> Index()
         {
-            return View(await _fornecedoresRepository.BuscarTodos());
+            return View(await _fornecedoresQueries.BuscarTodos());
         }
 
         public async Task<IActionResult> Details(int id)
         {
-            var fornecedor = await _fornecedoresRepository.Buscar(id);
+            var fornecedor = await _fornecedoresQueries.Buscar(id);
             if (fornecedor == null)
             {
                 return NotFound();
@@ -33,7 +39,7 @@ namespace entity_framework.Controllers
 
         public async Task<IActionResult> Create()
         {
-            ViewData["EnderecoId"] = new SelectList(await _fornecedoresRepository.BuscarEnderecos(), "Id", "Bairro");
+            ViewData["EnderecoId"] = new SelectList(await _fornecedoresQueries.BuscarEnderecos(), "Id", "Bairro");
             return View();
         }
 
@@ -43,22 +49,23 @@ namespace entity_framework.Controllers
         {
             if (ModelState.IsValid)
             {
-                _fornecedoresRepository.Adicionar(fornecedor);
-                await _fornecedoresRepository.UnitOfWork.Commit();
+                await _mediator.SendCommand(new NovoFornecedorCommand(fornecedor.Nome, 
+                fornecedor.DocumentoIdentificacao, 
+                fornecedor.TipoFornecedor, fornecedor.EnderecoId));
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EnderecoId"] = new SelectList(await _fornecedoresRepository.BuscarEnderecos(), "Id", "Bairro");
+            ViewData["EnderecoId"] = new SelectList(await _fornecedoresQueries.BuscarEnderecos(), "Id", "Bairro");
             return View(fornecedor);
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var fornecedor = await _fornecedoresRepository.Buscar(id);
+            var fornecedor = await _fornecedoresQueries.Buscar(id);
             if (fornecedor == null)
             {
                 return NotFound();
             }
-            ViewData["EnderecoId"] = new SelectList(await _fornecedoresRepository.BuscarEnderecos(), "Id", "Bairro");
+            ViewData["EnderecoId"] = new SelectList(await _fornecedoresQueries.BuscarEnderecos(), "Id", "Bairro");
             return View(fornecedor);
         }
 
@@ -75,8 +82,8 @@ namespace entity_framework.Controllers
             {
                 try
                 {
-                    _fornecedoresRepository.Atualizar(fornecedor);
-                    await _fornecedoresRepository.UnitOfWork.Commit();
+                    await _mediator.SendCommand(new AtualizarFornecedorCommand(id, fornecedor.Nome, 
+                    fornecedor.TipoFornecedor, fornecedor.EnderecoId));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -96,7 +103,7 @@ namespace entity_framework.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var fornecedor = await _fornecedoresRepository.Buscar(id);
+            var fornecedor = await _fornecedoresQueries.Buscar(id);
             if (fornecedor == null)
             {
                 return NotFound();
@@ -109,12 +116,11 @@ namespace entity_framework.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var fornecedor = await _fornecedoresRepository.Buscar(id);
-            _fornecedoresRepository.Deletar(fornecedor);
-            await _fornecedoresRepository.UnitOfWork.Commit();
+            await _mediator.SendCommand(new RemoverFornecedorCommand(id));
+            await _mediator.PublishEvent(new FornecedorInativadoEvent(id));
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<bool> FornecedorExiste(int id) => await _fornecedoresRepository.FornecedorExiste(id);
+        private async Task<bool> FornecedorExiste(int id) => await _fornecedoresQueries.FornecedorExiste(id);
     }
 }

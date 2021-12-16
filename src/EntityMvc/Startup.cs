@@ -17,6 +17,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Entity.Pedidos.Application.Handlers;
+using Entity.Produtos.Application.Queries;
+using MediatR;
+using Entity.Produtos.Application.Commands;
+using Entity.Produtos.Application.Events;
 
 namespace entity_framework
 {
@@ -46,6 +50,7 @@ namespace entity_framework
             services.AddScoped<IPedidosRepository, PedidosRepository>();
             services.AddScoped<IProdutosRepository, ProdutosRepository>();
             services.AddScoped<IFornecedoresRepository, FornecedoresRepository>();
+            services.AddScoped<IFornecedoresQueries, FornecedoresQueries>();
 
             //eventos
             services.AddSingleton<IMediatorHandler, MediatorHandler>((provider) => 
@@ -58,6 +63,15 @@ namespace entity_framework
                 mediator.RegistrarComandoHandler(new RemoverPedidoHandler(provider));
                 return mediator;
             });
+
+            services.AddMediatR(typeof(Startup));
+
+            services.AddScoped<IMediatorBibliotecaHandler, MediatorBibliotecaHandler>();
+
+            services.AddScoped<IRequestHandler<NovoFornecedorCommand, bool>, FornecedoresCommandHandler>();
+            services.AddScoped<IRequestHandler<AtualizarFornecedorCommand, bool>, FornecedoresCommandHandler>();
+            services.AddScoped<IRequestHandler<RemoverFornecedorCommand, bool>, FornecedoresCommandHandler>();
+            services.AddScoped<INotificationHandler<FornecedorInativadoEvent>, FornecedorEventHandler>();
 
             services.AddControllersWithViews();
         }
